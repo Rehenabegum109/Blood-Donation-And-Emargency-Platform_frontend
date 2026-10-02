@@ -1,0 +1,39 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bloodlink-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.bloodlink-float {
+  animation: bloodlink-float 4s ease-in-out infinite;
+}
+
+.bloodlink-float-slow {
+  animation: bloodlink-float 6s ease-in-out infinite;
+}
+
+.bloodlink-float-slower {
+  animation: bloodlink-float 7s ease-in-out infinite;
+}
