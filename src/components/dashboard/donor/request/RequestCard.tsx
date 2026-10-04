@@ -1,7 +1,10 @@
 "use client";
 
+import Link from "next/link";
+
 import {
   CalendarDays,
+  CheckCircle2,
   Droplets,
   Hospital,
   MapPin,
@@ -38,7 +41,9 @@ const urgencyLabels: Record<UrgencyLevel, string> = {
 };
 
 function formatBloodGroup(bloodGroup: string) {
-  return bloodGroup.replace("_POSITIVE", "+").replace("_NEGATIVE", "-");
+  return bloodGroup
+    .replace("_POSITIVE", "+")
+    .replace("_NEGATIVE", "-");
 }
 
 function formatDate(date: string) {
@@ -56,11 +61,18 @@ export default function RequestCard({
 }: RequestCardProps) {
   const isPending = request.status === "PENDING";
 
+  const isVerified =
+    request.verificationStatus === "VERIFIED";
+
+  const canDonate = isPending && isVerified;
+
   return (
     <article className="group overflow-hidden rounded-2xl border border-red-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-red-100/50">
+      {/* Header */}
       <div className="border-b border-red-50 bg-gradient-to-r from-red-50 via-white to-rose-50 px-5 py-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
+            {/* Blood Group */}
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-red-600 text-lg font-bold text-white shadow-lg shadow-red-200">
               {formatBloodGroup(request.bloodGroup)}
             </div>
@@ -77,6 +89,7 @@ export default function RequestCard({
             </div>
           </div>
 
+          {/* Urgency */}
           <span
             className={`rounded-full px-3 py-1 text-xs font-semibold ${
               urgencyStyles[request.urgency]
@@ -85,16 +98,32 @@ export default function RequestCard({
             {urgencyLabels[request.urgency]}
           </span>
         </div>
+
+        {/* Verification */}
+        <div className="mt-4">
+          {isVerified ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Verified by Admin
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700">
+              Verification Pending
+            </span>
+          )}
+        </div>
       </div>
 
+      {/* Body */}
       <div className="space-y-5 p-5">
+        {/* Request Information */}
         <div className="grid gap-5 sm:grid-cols-2">
           <RequestInfoItem
             icon={Droplets}
             label="Blood Required"
-            value={`${formatBloodGroup(request.bloodGroup)} • ${request.units} unit${
-              request.units > 1 ? "s" : ""
-            }`}
+            value={`${formatBloodGroup(request.bloodGroup)} • ${
+              request.units
+            } unit${request.units > 1 ? "s" : ""}`}
           />
 
           <RequestInfoItem
@@ -112,7 +141,10 @@ export default function RequestCard({
           <RequestInfoItem
             icon={MapPin}
             label="Hospital Address"
-            value={request.hospitalAddress || "Address not provided"}
+            value={
+              request.hospitalAddress ||
+              "Address not provided"
+            }
           />
 
           <RequestInfoItem
@@ -124,10 +156,14 @@ export default function RequestCard({
           <RequestInfoItem
             icon={MapPin}
             label="Recipient Location"
-            value={request.recipient.location || "Location not provided"}
+            value={
+              request.recipient.location ||
+              "Location not provided"
+            }
           />
         </div>
 
+        {/* Notes */}
         {request.notes && (
           <div className="rounded-xl bg-zinc-50 p-4">
             <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-zinc-400">
@@ -140,7 +176,9 @@ export default function RequestCard({
           </div>
         )}
 
-        <div className="flex flex-col gap-3 border-t border-zinc-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+        {/* Footer */}
+        <div className="flex flex-col gap-4 border-t border-zinc-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+          {/* Status */}
           <div>
             <span className="text-xs font-medium text-zinc-400">
               Request status
@@ -151,16 +189,48 @@ export default function RequestCard({
             </p>
           </div>
 
-          <Button
-            type="button"
-            isDisabled={!isPending || isDonating}
-            onClick={() => onDonate(request)}
-            className="w-full bg-red-600 text-white hover:bg-red-700 sm:w-auto"
-          >
-            <Droplets className="mr-2 h-4 w-4" />
+          {/* Actions */}
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            {/* View Details */}
+            <Button
+              asChild
+              type="button"
+              variant="outline"
+              className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 sm:w-auto"
+            >
+              <Link
+                href={`/dashboard/donor/requests/${request.id}`}
+              >
+                View Details
+              </Link>
+            </Button>
 
-            {isDonating ? "Submitting..." : "Donate Now"}
-          </Button>
+            {/* Accept Request */}
+            {canDonate ? (
+              <Button
+                type="button"
+                isDisabled={isDonating}
+                onClick={() => onDonate(request)}
+                className="w-full bg-red-600 text-white hover:bg-red-700 sm:w-auto"
+              >
+                <Droplets className="mr-2 h-4 w-4" />
+
+                {isDonating
+                  ? "Accepting..."
+                  : "Accept Request"}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                isDisabled
+                className="w-full cursor-not-allowed bg-zinc-100 text-zinc-400 sm:w-auto"
+              >
+                {!isVerified
+                  ? "Waiting for Verification"
+                  : "Request Unavailable"}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </article>

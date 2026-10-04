@@ -1,12 +1,17 @@
+import RecipientSidebar from "@/src/components/dashboard/recipient/RecipientSidebar";
 
-import type { ReactNode } from "react";
-
-interface RecipientLayoutProps {
-  children: ReactNode;
-}
-
-export default function RecipientLayout({
+export default function RecipientDashboardLayout({
   children,
-}: RecipientLayoutProps) {
-  return <>{children}</>;
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex min-h-screen bg-slate-50">
+      <RecipientSidebar />
+
+      <main className="min-w-0 flex-1">
+        {children}
+      </main>
+    </div>
+  );
 }

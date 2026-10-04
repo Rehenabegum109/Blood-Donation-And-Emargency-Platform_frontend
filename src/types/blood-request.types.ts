@@ -157,3 +157,13 @@ export interface IUpdateBloodRequestResponse {
   message: string;
   data: IBloodRequest;
 }
+export interface IGetBloodRequestsParams {
+  page?: number;
+  limit?: number;
+  status?: BloodRequestStatus;
+  bloodGroup?: BloodGroup;
+  urgency?: UrgencyLevel;
+  verificationStatus?: VerificationStatus;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}

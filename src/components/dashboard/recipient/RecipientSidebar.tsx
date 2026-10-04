@@ -8,6 +8,8 @@ import {
   PlusCircle,
   User,
   Heart,
+  CreditCard,
+  HandHeart,
 } from "lucide-react";
 
 const menuItems = [
@@ -30,6 +32,16 @@ const menuItems = [
     title: "Create Request",
     href: "/dashboard/recipient/requests?create=true",
     icon: PlusCircle,
+  },
+   {
+    title: "Donation Requests",
+    href: "/dashboard/recipient/donations",
+    icon: HandHeart,
+  },
+  {
+    title: "Payments",
+    href: "/dashboard/recipient/payments",
+    icon: CreditCard,
   },
 ];
 
@@ -70,10 +82,12 @@ export default function RecipientSidebar() {
           {menuItems.map((item) => {
             const Icon = item.icon;
 
+            const basePath = item.href.split("?")[0];
+
             const isActive =
               item.href === "/dashboard/recipient"
                 ? pathname === item.href
-                : pathname.startsWith(item.href.split("?")[0]);
+                : pathname.startsWith(basePath);
 
             return (
               <Link
@@ -106,7 +120,9 @@ export default function RecipientSidebar() {
               <Heart className="h-4 w-4 fill-white" />
             </div>
 
-            <p className="text-sm font-semibold">Need blood?</p>
+            <p className="text-sm font-semibold">
+              Need blood?
+            </p>
 
             <p className="mt-1 text-xs leading-5 text-red-100">
               Create a blood request and let nearby donors know.

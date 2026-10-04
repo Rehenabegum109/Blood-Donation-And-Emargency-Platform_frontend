@@ -1,15 +1,14 @@
-
 "use client";
 
 import { useState } from "react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-
 import { useGetBloodRequests } from "@/src/hooks/use-blood-request";
 import { useCreateDonation } from "@/src/hooks/use-donation";
 
 import type { IBloodRequest } from "@/src/types/blood-request.types";
+
 import RequestsHeader from "@/src/components/dashboard/donor/request/RequestsHeader";
 import RequestsEmpty from "@/src/components/dashboard/donor/request/RequestsEmpty";
 import RequestCard from "@/src/components/dashboard/donor/request/RequestCard";
@@ -18,14 +17,18 @@ import RequestsPagination from "@/src/components/dashboard/donor/request/Request
 export default function DonorRequestsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [donatingRequestId, setDonatingRequestId] = useState<string | null>(
-    null
-  );
+  const [donatingRequestId, setDonatingRequestId] =
+    useState<string | null>(null);
 
-  const { data, isPending, isError, error } = useGetBloodRequests({
+  // All blood requests
+  const {
+    data,
+    isPending,
+    isError,
+    error,
+  } = useGetBloodRequests({
     page,
     limit: 10,
-    status: "PENDING",
     sortBy: "createdAt",
     sortOrder: "desc",
   });
@@ -35,6 +38,7 @@ export default function DonorRequestsPage() {
   const requests = data?.data ?? [];
   const meta = data?.meta;
 
+  // Search
   const filteredRequests = requests.filter((request) => {
     const searchValue = search.toLowerCase().trim();
 
@@ -43,14 +47,41 @@ export default function DonorRequestsPage() {
     }
 
     return (
-      request.hospitalName.toLowerCase().includes(searchValue) ||
-      request.hospitalAddress?.toLowerCase().includes(searchValue) ||
-      request.patientName?.toLowerCase().includes(searchValue) ||
-      request.recipient.name.toLowerCase().includes(searchValue)
+      request.hospitalName
+        ?.toLowerCase()
+        .includes(searchValue) ||
+      request.hospitalAddress
+        ?.toLowerCase()
+        .includes(searchValue) ||
+      request.patientName
+        ?.toLowerCase()
+        .includes(searchValue) ||
+      request.recipient.name
+        ?.toLowerCase()
+        .includes(searchValue) ||
+      request.bloodGroup
+        ?.toLowerCase()
+        .includes(searchValue)
     );
   });
 
+  // Accept / Donate
   const handleDonate = (request: IBloodRequest) => {
+    // Safety check
+    if (request.status !== "PENDING") {
+      toast.error(
+        "This blood request is no longer available."
+      );
+      return;
+    }
+
+    if (request.verificationStatus !== "VERIFIED") {
+      toast.error(
+        "This blood request has not been verified by admin yet."
+      );
+      return;
+    }
+
     setDonatingRequestId(request.id);
 
     createDonation.mutate(
@@ -62,16 +93,37 @@ export default function DonorRequestsPage() {
         onSuccess: (response) => {
           toast.success(
             response.message ||
-              "Donation request submitted successfully."
+              "Donation request accepted successfully!"
           );
         },
 
-        onError: (error: any) => {
-          const message =
-            error?.response?.data?.message ||
-            "Failed to submit donation request.";
+        onError: (error: unknown) => {
+          const axiosError = error as {
+            response?: {
+              data?: {
+                message?: string;
+              };
+            };
+          };
 
-          toast.error(message);
+          const backendMessage =
+            axiosError.response?.data?.message || "";
+
+          if (
+            backendMessage
+              .toLowerCase()
+              .includes("already submitted")
+          ) {
+            toast.info(
+              "You have already submitted a donation for this blood request."
+            );
+            return;
+          }
+
+          toast.error(
+            backendMessage ||
+              "Failed to submit donation request."
+          );
         },
 
         onSettled: () => {
@@ -84,6 +136,7 @@ export default function DonorRequestsPage() {
   return (
     <section className="min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl">
+        {/* Header */}
         <RequestsHeader
           search={search}
           onSearchChange={(value) => {
@@ -92,6 +145,7 @@ export default function DonorRequestsPage() {
           }}
         />
 
+        {/* Loading */}
         {isPending && (
           <div className="flex min-h-[350px] items-center justify-center">
             <div className="text-center">
@@ -104,6 +158,7 @@ export default function DonorRequestsPage() {
           </div>
         )}
 
+        {/* Error */}
         {isError && (
           <div className="flex min-h-[300px] items-center justify-center">
             <div className="max-w-md rounded-2xl border border-red-100 bg-white p-8 text-center shadow-sm">
@@ -124,6 +179,7 @@ export default function DonorRequestsPage() {
           </div>
         )}
 
+        {/* Data */}
         {!isPending && !isError && (
           <>
             {filteredRequests.length === 0 ? (
@@ -135,13 +191,16 @@ export default function DonorRequestsPage() {
                     key={request.id}
                     request={request}
                     onDonate={handleDonate}
-                    isDonating={donatingRequestId === request.id}
+                    isDonating={
+                      donatingRequestId === request.id
+                    }
                   />
                 ))}
               </div>
             )}
 
-            {meta && (
+            {/* Pagination */}
+            {meta && meta.totalPages > 1 && (
               <RequestsPagination
                 page={meta.page}
                 totalPages={meta.totalPages}

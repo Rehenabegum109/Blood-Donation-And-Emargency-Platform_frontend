@@ -12,7 +12,9 @@ import {
   getAllBloodRequests,
   getBloodRequestById,
   IGetBloodRequestsParams,
+  rejectBloodRequest,
   updateBloodRequest,
+  verifyBloodRequest,
 } from "@/src/services/blood-request/blood-request.api";
 
 import type {
@@ -93,6 +95,56 @@ export function useDeleteBloodRequest() {
 
       queryClient.removeQueries({
         queryKey: ["blood-request", id],
+      });
+    },
+  });
+}
+
+export function useVerifyBloodRequest() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) =>
+      verifyBloodRequest(id),
+
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({
+        queryKey: ["blood-requests"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["blood-request", id],
+      });
+    },
+  });
+}
+
+export function useRejectBloodRequest() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      rejectionReason,
+    }: {
+      id: string;
+      rejectionReason: string;
+    }) =>
+      rejectBloodRequest(
+        id,
+        rejectionReason
+      ),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["blood-requests"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "blood-request",
+          variables.id,
+        ],
       });
     },
   });

@@ -4,16 +4,22 @@ import Link from "next/link";
 import {
   ArrowRight,
   CalendarDays,
+  CheckCircle2,
   Clock3,
+  CreditCard,
   Droplets,
   Edit3,
   Hospital,
+  Loader2,
   MapPin,
   Trash2,
   UserRound,
 } from "lucide-react";
 
 import type { IBloodRequest } from "@/src/types/blood-request.types";
+
+import PayNowButton from "@/src/components/dashboard/recipient/PayNowButton";
+import { useGetMyPayments } from "@/src/hooks/use-payment";
 
 interface RequestCardProps {
   request: IBloodRequest;
@@ -85,6 +91,33 @@ function getVerificationClass(status: string) {
 export default function RequestCard({
   request,
 }: RequestCardProps) {
+  const {
+    data: paymentResponse,
+    isLoading: isPaymentLoading,
+  } = useGetMyPayments({
+    page: 1,
+    limit: 100,
+  });
+
+  const payments = paymentResponse?.data ?? [];
+
+  const payment = payments.find(
+    (item) => item.bloodRequestId === request.id
+  );
+
+  const canPay =
+    request.status === "FULFILLED" &&
+    request.verificationStatus === "VERIFIED";
+
+  const isPaid = payment?.status === "PAID";
+
+  const isPaymentPending =
+    payment?.status === "PENDING";
+
+  const isPaymentFailed =
+    payment?.status === "FAILED" ||
+    payment?.status === "CANCELLED";
+
   return (
     <article className="group overflow-hidden rounded-3xl border border-red-100 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-red-100/40">
       {/* Header */}
@@ -241,6 +274,99 @@ export default function RequestCard({
           Created {formatDate(request.createdAt)}
         </p>
       </div>
+
+      {/* Payment Section */}
+      {canPay && (
+        <div className="mx-5 mb-5 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-50 p-4 sm:mx-6">
+          {isPaymentLoading ? (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white">
+                <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
+              </div>
+
+              <div>
+                <p className="font-bold text-emerald-800">
+                  Checking payment status...
+                </p>
+
+                <p className="mt-1 text-xs text-emerald-600">
+                  Please wait.
+                </p>
+              </div>
+            </div>
+          ) : isPaid ? (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              </div>
+
+              <div>
+                <p className="font-bold text-emerald-800">
+                  Payment Completed
+                </p>
+
+                <p className="mt-1 text-xs text-emerald-600">
+                  Your payment has been successfully completed.
+                </p>
+
+                {payment.transactionId && (
+                  <p className="mt-1 text-xs font-semibold text-emerald-700">
+                    Transaction: {payment.transactionId}
+                  </p>
+                )}
+              </div>
+            </div>
+          ) : isPaymentPending ? (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-yellow-100">
+                <Clock3 className="h-5 w-5 text-yellow-600" />
+              </div>
+
+              <div>
+                <p className="font-bold text-yellow-800">
+                  Payment Pending
+                </p>
+
+                <p className="mt-1 text-xs text-yellow-700">
+                  Your payment is currently being processed.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
+                  <CreditCard className="h-5 w-5" />
+                </div>
+
+                <div>
+                  <p className="font-bold text-emerald-800">
+                    Payment Required
+                  </p>
+
+                  <p className="mt-1 text-xs leading-5 text-emerald-600">
+                    Complete your payment through bKash.
+                  </p>
+
+                  <p className="mt-1 text-xs font-semibold text-emerald-700">
+                    Amount: ৳{request.units * 100}
+                  </p>
+
+                  {isPaymentFailed && (
+                    <p className="mt-1 text-xs font-semibold text-red-600">
+                      Previous payment was not completed.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <PayNowButton
+                bloodRequestId={request.id}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Footer Actions */}
       <div className="flex flex-col gap-3 border-t border-zinc-100 bg-zinc-50/70 p-5 sm:p-6">
