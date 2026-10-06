@@ -56,15 +56,19 @@ export function useGetMyPayments(
   });
 }
 
-export function useGetAllPayments(
+export const useGetAllPayments = (
   params?: IGetAllPaymentsParams
-) {
+) => {
   return useQuery({
-    queryKey: ["payments", "all", params],
-    queryFn: () => getAllPayments(params),
-  });
-}
+    queryKey: [
+      "admin-payments",
+      params,
+    ],
 
+    queryFn: () =>
+      getAllPayments(params),
+  });
+};
 export function useGetSinglePayment(
   id: string
 ) {

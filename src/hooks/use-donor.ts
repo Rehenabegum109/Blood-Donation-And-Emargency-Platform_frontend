@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -10,13 +11,25 @@ import {
   getMyDonorProfile,
   updateDonorAvailability,
   updateDonorLocation,
+  matchDonors,
+  findNearbyDonors,
 } from "@/src/services/donor/donor.api";
 
 import {
   IUpdateAvailabilityPayload,
   IUpdateDonorLocationPayload,
 } from "@/src/types/donor.types";
-import { approveDonation, cancelDonation, getReceivedDonations, rejectDonation } from "../services/donation/donation.api";
+
+import {
+  approveDonation,
+  cancelDonation,
+  getReceivedDonations,
+  rejectDonation,
+} from "@/src/services/donation/donation.api";
+
+// ============================================
+// GET MY DONOR PROFILE
+// ============================================
 
 export function useGetMyDonorProfile() {
   return useQuery({
@@ -25,7 +38,11 @@ export function useGetMyDonorProfile() {
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
-};
+}
+
+// ============================================
+// GET RECEIVED DONATIONS
+// ============================================
 
 export function useGetReceivedDonations(
   page: number = 1,
@@ -36,6 +53,10 @@ export function useGetReceivedDonations(
     queryFn: () => getReceivedDonations(page, limit),
   });
 }
+
+// ============================================
+// UPDATE DONOR AVAILABILITY
+// ============================================
 
 export function useUpdateDonorAvailability() {
   const queryClient = useQueryClient();
@@ -52,6 +73,10 @@ export function useUpdateDonorAvailability() {
   });
 }
 
+// ============================================
+// UPDATE DONOR LOCATION
+// ============================================
+
 export function useUpdateDonorLocation() {
   const queryClient = useQueryClient();
 
@@ -65,8 +90,60 @@ export function useUpdateDonorLocation() {
       });
     },
   });
-};
+}
 
+// ============================================
+// MATCH COMPATIBLE DONORS
+// ============================================
+
+export function useMatchDonors(
+  bloodRequestId?: string
+) {
+  return useQuery({
+    queryKey: ["matched-donors", bloodRequestId],
+
+    queryFn: () => matchDonors(bloodRequestId!),
+
+    enabled: !!bloodRequestId,
+
+    retry: false,
+
+    staleTime: 60 * 1000,
+  });
+}
+
+// ============================================
+// FIND NEARBY DONORS
+// ============================================
+
+export function useFindNearbyDonors(
+  bloodRequestId?: string,
+  radius: number = 20
+) {
+  return useQuery({
+    queryKey: [
+      "nearby-donors",
+      bloodRequestId,
+      radius,
+    ],
+
+    queryFn: () =>
+      findNearbyDonors(
+        bloodRequestId!,
+        radius
+      ),
+
+    enabled: !!bloodRequestId,
+
+    retry: false,
+
+    staleTime: 60 * 1000,
+  });
+}
+
+// ============================================
+// CANCEL DONATION
+// ============================================
 
 export function useCancelDonation() {
   const queryClient = useQueryClient();
@@ -81,7 +158,11 @@ export function useCancelDonation() {
       });
     },
   });
-};
+}
+
+// ============================================
+// APPROVE DONATION
+// ============================================
 
 export function useApproveDonation() {
   const queryClient = useQueryClient();
@@ -101,6 +182,10 @@ export function useApproveDonation() {
     },
   });
 }
+
+// ============================================
+// REJECT DONATION
+// ============================================
 
 export function useRejectDonation() {
   const queryClient = useQueryClient();

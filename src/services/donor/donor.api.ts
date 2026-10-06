@@ -35,3 +35,28 @@ export async function updateDonorLocation(
 
   return response.data;
 }
+
+
+export const matchDonors = async (bloodRequestId: string) => {
+  const response = await apiClient.get(
+    `/donors/match/${bloodRequestId}`
+  );
+
+  return response.data;
+};
+
+export const findNearbyDonors = async (
+  bloodRequestId: string,
+  radius: number = 20
+) => {
+  const response = await apiClient.get(
+    `/donors/nearby/${bloodRequestId}`,
+    {
+      params: {
+        radius,
+      },
+    }
+  );
+
+  return response.data;
+};

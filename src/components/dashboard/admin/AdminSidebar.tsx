@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Activity,
   ClipboardList,
+  CreditCard,
   Droplets,
   FileClock,
   Heart,
@@ -39,11 +40,17 @@ const menuItems = [
     href: "/dashboard/admin/donations",
     icon: HeartHandshake,
   },
+{
+  title: "Payments",
+  href: "/dashboard/admin/payments",
+  icon: CreditCard,
+},
   {
     title: "Verifications",
     href: "/dashboard/admin/verifications",
     icon: ShieldCheck,
   },
+    
   {
     title: "Audit Logs",
     href: "/dashboard/admin/audit-logs",
