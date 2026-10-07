@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -52,12 +53,7 @@ export default function AdminVerificationsPage() {
   const [rejectRequest, setRejectRequest] =
     useState<IBloodRequest | null>(null);
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-  } = useGetBloodRequests({
+  const { data, isLoading, isError, error } = useGetBloodRequests({
     page,
     limit,
     verificationStatus: "PENDING",
@@ -194,10 +190,11 @@ export default function AdminVerificationsPage() {
         {/* Reject Dialog */}
         {rejectRequest && (
           <RejectRequestDialog
+            key={rejectRequest.id}
             request={rejectRequest}
             open={Boolean(rejectRequest)}
             isSubmitting={rejectMutation.isPending}
-            onOpenChange={(open) => {
+            onOpenChange={(open: boolean) => {
               if (!open) {
                 setRejectRequest(null);
               }

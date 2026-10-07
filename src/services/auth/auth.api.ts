@@ -1,143 +1,68 @@
-import { IForgotPasswordPayload, IGoogleLoginPayload, ILoginPayload, IRegisterPayload, IResetPasswordPayload, IVerifyEmailPayload } from "@/src/types/auth.types";
 
+import { apiClient } from "@/src/lib/api-client";
+import {
+  IForgotPasswordPayload,
+  IGoogleLoginPayload,
+  ILoginPayload,
+  IRegisterPayload,
+  IResetPasswordPayload,
+  IVerifyEmailPayload,
+} from "@/src/types/auth.types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function registerUser(payload: IRegisterPayload) {
-  const response = await fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
+  const response = await apiClient.post("/auth/register", payload);
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Registration failed");
-  }
-
-  return data;
+  return response.data;
 }
 
 export async function verifyEmail(payload: IVerifyEmailPayload) {
-  const response = await fetch(`${API_URL}/auth/verify-email`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
+  const response = await apiClient.post("/auth/verify-email", payload);
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Email verification failed");
-  }
-
-  return data;
+  return response.data;
 }
 
 export async function loginUser(payload: ILoginPayload) {
-  const response = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
+  const response = await apiClient.post("/auth/login", payload);
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Login failed");
-  }
-
-  return data;
+  return response.data;
 }
 
 export async function forgotPassword(
   payload: IForgotPasswordPayload
 ) {
-  const response = await fetch(`${API_URL}/auth/forgot-password`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
+  const response = await apiClient.post(
+    "/auth/forgot-password",
+    payload
+  );
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Request failed");
-  }
-
-  return data;
+  return response.data;
 }
 
 export async function resetPassword(
   payload: IResetPasswordPayload
 ) {
-  const response = await fetch(`${API_URL}/auth/reset-password`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
+  const response = await apiClient.post(
+    "/auth/reset-password",
+    payload
+  );
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Password reset failed");
-  }
-
-  return data;
+  return response.data;
 }
 
 export async function googleLogin(
   payload: IGoogleLoginPayload
 ) {
-  const response = await fetch(`${API_URL}/auth/google`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Google login failed");
-  }
-
-  return data;
-}
-
-
-export async function logoutUser() {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
-    {
-      method: "POST",
-      credentials: "include",
-    }
+  const response = await apiClient.post(
+    "/auth/google",
+    payload
   );
 
-  const data = await response.json();
+  return response.data;
+}
 
-  if (!response.ok) {
-    throw new Error(data.message || "Logout failed");
-  }
+export async function logoutUser() {
+  const response = await apiClient.post("/auth/logout");
 
-  return data;
+  return response.data;
 }

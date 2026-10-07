@@ -622,10 +622,9 @@ export default function FindDonorsPage() {
                           Compatible:{" "}
                           {matchedQuery.data.data.compatibleBloodGroups
                             .map(
-                              (group) =>
-                                bloodGroupLabels[
-                                  group as BloodGroup
-                                ] || group
+                              (group: BloodGroup) =>
+                                bloodGroupLabels[group] ||
+                                group
                             )
                             .join(", ")}
                         </p>

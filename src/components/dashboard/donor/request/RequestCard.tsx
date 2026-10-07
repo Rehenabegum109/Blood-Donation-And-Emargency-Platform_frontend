@@ -192,18 +192,12 @@ export default function RequestCard({
           {/* Actions */}
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
             {/* View Details */}
-            <Button
-              asChild
-              type="button"
-              variant="outline"
-              className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 sm:w-auto"
+            <Link
+              href={`/dashboard/donor/requests/${request.id}`}
+              className="inline-flex w-full items-center justify-center rounded-md border border-red-200 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700 sm:w-auto"
             >
-              <Link
-                href={`/dashboard/donor/requests/${request.id}`}
-              >
-                View Details
-              </Link>
-            </Button>
+              View Details
+            </Link>
 
             {/* Accept Request */}
             {canDonate ? (

@@ -1,41 +1,23 @@
-import { IGetMeResponse, IUpdateProfilePayload, IUpdateProfileResponse } from "@/src/types/user.types";
+
+import { apiClient } from "@/src/lib/api-client";
+import {
+  IGetMeResponse,
+  IUpdateProfilePayload,
+  IUpdateProfileResponse,
+} from "@/src/types/user.types";
 
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getMe(): Promise<IGetMeResponse> {
-  const response = await fetch(`${API_URL}/users/me`, {
-    method: "GET",
-    credentials: "include",
-    cache: "no-store",
-  });
+  const response = await apiClient.get("/users/me");
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to get profile");
-  }
-
-  return data;
+  return response.data;
 }
 
 export async function updateMyProfile(
   payload: IUpdateProfilePayload
 ): Promise<IUpdateProfileResponse> {
-  const response = await fetch(`${API_URL}/users/me`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
+  const response = await apiClient.patch("/users/me", payload);
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to update profile");
-  }
-
-  return data;
+  return response.data;
 }
