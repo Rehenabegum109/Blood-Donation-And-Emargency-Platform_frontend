@@ -146,9 +146,7 @@ export default function PayNowButton({
         return;
       }
 
-      /* =========================
-         Stripe Payment
-      ========================= */
+    
       const result =
         await createStripeCheckout.mutateAsync({
           bloodRequestId,
@@ -160,7 +158,7 @@ export default function PayNowButton({
       );
 
       const checkoutUrl =
-        result?.data?.checkoutUrl;
+        result?.data?.paymentUrl;
 
       console.log(
         "Stripe checkout URL:",
@@ -172,12 +170,7 @@ export default function PayNowButton({
           "Stripe checkout URL was not returned"
         );
       }
-      console.log("========== STRIPE DEBUG ==========");
-console.log("FULL RESULT:", result);
-console.log("RESULT DATA:", result?.data);
-console.log("CHECKOUT URL:", result?.data?.checkoutUrl);
-console.log("SESSION ID:", result?.data?.sessionId);
-console.log("===================================");
+     
 
       toast.success(
         "Stripe checkout initiated successfully"
