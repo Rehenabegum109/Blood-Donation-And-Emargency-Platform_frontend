@@ -1,7 +1,8 @@
+
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ClipboardList,
   LayoutDashboard,
@@ -10,7 +11,9 @@ import {
   Heart,
   CreditCard,
   HandHeart,
+  LogOut,
 } from "lucide-react";
+import { toast } from "sonner";
 
 const menuItems = [
   {
@@ -33,7 +36,7 @@ const menuItems = [
     href: "/dashboard/recipient/requests?create=true",
     icon: PlusCircle,
   },
-   {
+  {
     title: "Donation Requests",
     href: "/dashboard/recipient/donations",
     icon: HandHeart,
@@ -47,6 +50,12 @@ const menuItems = [
 
 export default function RecipientSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    toast.success("Redirecting to login...");
+    router.replace("/login");
+  };
 
   return (
     <aside className="hidden min-h-screen w-64 shrink-0 border-r border-red-100 bg-gradient-to-b from-red-700 via-red-600 to-rose-600 text-white shadow-xl md:block">
@@ -81,7 +90,6 @@ export default function RecipientSidebar() {
 
           {menuItems.map((item) => {
             const Icon = item.icon;
-
             const basePath = item.href.split("?")[0];
 
             const isActive =
@@ -114,20 +122,30 @@ export default function RecipientSidebar() {
         </nav>
 
         {/* Bottom Card */}
-        <div className="p-4">
+        <div className="px-4 pb-4">
           <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur">
             <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-white/15">
               <Heart className="h-4 w-4 fill-white" />
             </div>
 
-            <p className="text-sm font-semibold">
-              Need blood?
-            </p>
+            <p className="text-sm font-semibold">Need blood?</p>
 
             <p className="mt-1 text-xs leading-5 text-red-100">
               Create a blood request and let nearby donors know.
             </p>
           </div>
+        </div>
+
+        {/* Logout */}
+        <div className="border-t border-white/15 p-4">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-50 transition-all hover:bg-white/10 hover:text-white"
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Logout</span>
+          </button>
         </div>
       </div>
     </aside>

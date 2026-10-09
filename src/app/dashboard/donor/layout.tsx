@@ -1,4 +1,8 @@
+
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   User,
@@ -7,23 +11,55 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function DonorDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
- const menuItems = [ { title: "Dashboard", href: "/dashboard/donor", icon: LayoutDashboard, }, { title: "My Profile", href: "/dashboard/donor/profile", icon: User, }, { title: "My Donations", href: "/dashboard/donor/donations", icon: HeartPulse, }, { title: "Blood Requests", href: "/dashboard/donor/requests", icon: ClipboardList, }, { title: "Settings", href: "/dashboard/donor/settings", icon: Settings, }, ];
+  const router = useRouter();
+
+  const menuItems = [
+    {
+      title: "Dashboard",
+      href: "/dashboard/donor",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "My Profile",
+      href: "/dashboard/donor/profile",
+      icon: User,
+    },
+    {
+      title: "My Donations",
+      href: "/dashboard/donor/donations",
+      icon: HeartPulse,
+    },
+    {
+      title: "Blood Requests",
+      href: "/dashboard/donor/requests",
+      icon: ClipboardList,
+    },
+    {
+      title: "Settings",
+      href: "/dashboard/donor/settings",
+      icon: Settings,
+    },
+  ];
+
+  const handleLogout = () => {
+    toast.success("Redirecting to login...");
+    router.replace("/login");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-red-50">
       <div className="flex min-h-screen">
-
         {/* Sidebar */}
-        <aside className="hidden w-64 border-r border-red-100 bg-gradient-to-b from-red-700 via-red-600 to-rose-600 text-white shadow-xl md:block">
-           
+        <aside className="hidden w-64 shrink-0 border-r border-red-100 bg-gradient-to-b from-red-700 via-red-600 to-rose-600 text-white shadow-xl md:flex md:flex-col">
           {/* Logo */}
-          <div className="flex h-16 items-center border-b border-white/15 px-6">
+          <div className="flex h-16 shrink-0 items-center border-b border-white/15 px-6">
             <Link
               href="/"
               className="text-2xl font-black tracking-tight"
@@ -34,36 +70,41 @@ export default function DonorDashboardLayout({
           </div>
 
           {/* Navigation */}
-          <nav className="space-y-2 p-4">
+          <nav className="flex flex-1 flex-col p-4">
+            <div className="flex-1 space-y-2">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
 
-            {menuItems.map((item) => {
-              const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-50 transition-all duration-200 hover:bg-white/15 hover:text-white"
+                  >
+                    <Icon className="h-5 w-5 transition-transform duration-200 group-hover:scale-110" />
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-50 transition-all duration-200 hover:bg-white/15 hover:text-white"
-                >
-                  <Icon className="h-5 w-5 transition-transform duration-200 group-hover:scale-110" />
-                  <span>{item.title}</span>
-                </Link>
-              );
-            })}
+                    <span>{item.title}</span>
+                  </Link>
+                );
+              })}
+            </div>
 
-            {/* Logout */}
-            <button
-              type="button"
-              className="group mt-4 flex w-full items-center gap-3 rounded-xl border-t border-white/15 px-4 py-4 pt-5 text-sm font-medium text-red-50 transition-all hover:text-white"
-            >
-              <LogOut className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
-              <span>Logout</span>
-            </button>
+            {/* Logout Button */}
+            <div className="mt-4 border-t border-white/15 pt-4">
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-red-50 transition-all duration-200 hover:bg-white/15 hover:text-white"
+              >
+                <LogOut className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
 
+                <span>Logout</span>
+              </button>
+            </div>
           </nav>
 
-          {/* Sidebar Bottom Card */}
-          <div className="mx-4 mt-8 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
+          {/* Sidebar Footer */}
+          <div className="mx-4 mb-5 rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/15">
               <HeartPulse className="h-5 w-5 text-white" />
             </div>
@@ -79,25 +120,25 @@ export default function DonorDashboardLayout({
         </aside>
 
         {/* Main Content */}
-        <main className="relative flex-1 overflow-hidden">
+        <main className="relative min-w-0 flex-1 overflow-hidden">
+          {/* Decorative Background */}
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-red-200/30 blur-3xl" />
 
-          {/* Background decorations */}
-          <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-red-200/30 blur-3xl" />
+            <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-rose-200/30 blur-3xl" />
 
-          <div className="pointer-events-none absolute -bottom-40 left-1/3 h-96 w-96 rounded-full bg-rose-200/30 blur-3xl" />
-
-          {/* Soft grid */}
-          <div
-            className="pointer-events-none absolute inset-0 opacity-[0.025]"
-            style={{
-              backgroundImage:
-                "linear-gradient(#dc2626 1px, transparent 1px), linear-gradient(90deg, #dc2626 1px, transparent 1px)",
-              backgroundSize: "60px 60px",
-            }}
-          />
+            <div
+              className="absolute inset-0 opacity-[0.025]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(#dc2626 1px, transparent 1px), linear-gradient(90deg, #dc2626 1px, transparent 1px)",
+                backgroundSize: "32px 32px",
+              }}
+            />
+          </div>
 
           {/* Page Content */}
-          <div className="relative z-10">
+          <div className="relative z-10 min-h-screen">
             {children}
           </div>
         </main>
