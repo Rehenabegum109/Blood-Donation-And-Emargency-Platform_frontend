@@ -25,6 +25,11 @@ const navItems = [
   { name: "Contact", href: "/contact" },
 ];
 
+const protectedRoutes = [
+  "/find-donors",
+  "/blood-requests",
+];
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
@@ -36,6 +41,21 @@ export default function Navbar() {
 
   const user = data?.data;
   const isLoggedIn = !!user;
+
+  const handleProtectedNavigation = (href: string) => {
+    setOpen(false);
+
+    if (isPending) return;
+
+    if (!isLoggedIn && protectedRoutes.includes(href)) {
+      router.push(
+        `/login?redirect=${encodeURIComponent(href)}`
+      );
+      return;
+    }
+
+    router.push(href);
+  };
 
   const handleLogout = async () => {
     try {
@@ -71,15 +91,28 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 md:flex">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-red-600"
-            >
-              {item.name}
-            </Link>
-          ))}
+          {navItems.map((item) =>
+            protectedRoutes.includes(item.href) ? (
+              <button
+                key={item.href}
+                type="button"
+                onClick={() =>
+                  handleProtectedNavigation(item.href)
+                }
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-red-600"
+              >
+                {item.name}
+              </button>
+            ) : (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-red-600"
+              >
+                {item.name}
+              </Link>
+            )
+          )}
         </nav>
 
         {/* Desktop Auth */}
@@ -174,19 +207,31 @@ export default function Navbar() {
           <nav className="mx-auto flex max-w-7xl flex-col px-4 py-4 sm:px-6">
 
             {/* Navigation Links */}
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className="rounded-md px-3 py-3 text-sm font-medium text-foreground hover:bg-muted"
-              >
-                {item.name}
-              </Link>
-            ))}
+            {navItems.map((item) =>
+              protectedRoutes.includes(item.href) ? (
+                <button
+                  key={item.href}
+                  type="button"
+                  onClick={() =>
+                    handleProtectedNavigation(item.href)
+                  }
+                  className="w-full rounded-md px-3 py-3 text-left text-sm font-medium text-foreground hover:bg-muted"
+                >
+                  {item.name}
+                </button>
+              ) : (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="rounded-md px-3 py-3 text-sm font-medium text-foreground hover:bg-muted"
+                >
+                  {item.name}
+                </Link>
+              )
+            )}
 
             <div className="mt-3 border-t border-border pt-4">
-
               {isPending ? (
                 <div className="h-9 w-full animate-pulse rounded-md bg-muted" />
               ) : isLoggedIn ? (
@@ -243,7 +288,6 @@ export default function Navbar() {
                       ? "Logging out..."
                       : "Logout"}
                   </Button>
-
                 </div>
               ) : (
                 <div className="flex gap-2">
@@ -265,10 +309,8 @@ export default function Navbar() {
                   >
                     Register
                   </Link>
-
                 </div>
               )}
-
             </div>
           </nav>
         </div>
